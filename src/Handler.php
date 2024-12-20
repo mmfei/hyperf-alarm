@@ -33,12 +33,16 @@ class Handler extends AbstractHandler
     public function handle(LogRecord $record): bool
     {
         if ($this->isHandling($record)) {
+            $d = $record->datetime;
+            if($d instanceof \Monolog\JsonSerializableDateTimeImmutable) {
+                $d=new \DateTime($record->datetime->format('Y-m-d H:i:s'));
+            }
             $data = new Record();
             $data->handlers = $this->handlers;
             $data->message = $record['message'];
             $data->context = $record['context'];
             $data->level = $record['level_name'];
-            $data->datetime = $record['datetime'];
+            $data->datetime = $d;
             $data->extra = $record['extra'];
             Manager::send($data);
         }
